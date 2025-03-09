@@ -152,7 +152,7 @@ class AutoReservation:
                 By.XPATH,
                 '//ul[@class="ydfw_r_content"]//li[1]//a[1]'
         ).click()
-        time.sleep(1)
+        time.sleep(0.5)
         self.driver.switch_to.window(self.driver.window_handles[-1])
 
         # 选择场馆，场馆列表使用iframe标签内嵌了一个网页，要切换frame
@@ -173,7 +173,7 @@ class AutoReservation:
                 if self.refresh_count <= 0:
                     return
                 self.driver.refresh()
-                sleep(1)
+                sleep(0.5)
 
         while True:
             try:
@@ -191,10 +191,10 @@ class AutoReservation:
                 if self.refresh_count <= 0:
                     return
                 self.driver.refresh()
-                sleep(1)
+                sleep(0.5)
 
         # 点击预约，页面跳转
-        time.sleep(1)
+        time.sleep(0.5)
         self.driver.switch_to.window(self.driver.window_handles[-1])
         self.wait.until(
             ExpectedCond.element_to_be_clickable(
@@ -269,7 +269,7 @@ class AutoReservation:
                 # 判断reservationBtn是否有onClick属性
                 if reservationBtn.get_dom_attribute('onClick'):
                     # 可以预约
-                    sleep(0.5)
+                    sleep(0.3)
                     reservationBtn.click()
                     print_with_time("进入预约时间")
                     # 进入预约验证页面点击verify_button1
@@ -291,7 +291,6 @@ class AutoReservation:
                     # 不能预约，一秒钟刷新一次
                     #raise Exception("场地：{}，日期：{}，时间：{}，无法预约".format(self.reservation_arena, self.reservation_date, self.reservation_time))
                     print_with_time("无法预约，刷新")
-                    sleep(1)
                     self.refresh_count -= 1
                     if self.refresh_count < 0:
                         return "next"
@@ -329,9 +328,14 @@ class AutoReservation:
                     By.CLASS_NAME, 'valid_bg-img'
                 )
                 print_with_time("验证码图片加载成功,time:"+ time.strftime("%H:%M:%S", time.localtime()))
+                self.wait.until(
+                    lambda driver: img_block.get_dom_attribute('src') != '',
+                    message="验证码src属性加载超时",
+                )
                 src = img_block.get_dom_attribute('src')
                 verifyPic_base64 = src.replace('data:image/jpg;base64,', '')
-            except:
+            except Exception as e:
+                print_with_time(e)
                 if self.img_refresh_count > 0:
                     print_with_time("刷新验证码1")
                     self.driver.find_element(By.CLASS_NAME, 'valid_refresh').click()
@@ -343,7 +347,8 @@ class AutoReservation:
             recogResults = self.pass_capcha(verifyPic_base64)
             try:
                 target = self.driver.find_element(By.CLASS_NAME,"valid_tips__text")
-            except:
+            except Exception as e:
+                print_with_time(e)
                 print_with_time("字符串获取失败")
             move = ActionChains(self.driver)
             img_block_size = img_block.size
@@ -408,7 +413,7 @@ class AutoReservation:
                 if self.img_refresh_count > 0:
                     print_with_time("刷新验证码2")
                     self.driver.find_element(By.CLASS_NAME, 'valid_refresh').click()
-                    sleep(1)
+                    sleep(0.3)
                     self.img_refresh_count -= 1
                 else:
                     return
@@ -484,5 +489,3 @@ if __name__ == "__main__":
 
     finally:
         ar.clean_up()
-
-
