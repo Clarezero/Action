@@ -497,4 +497,3 @@ if __name__ == "__main__":
 
     finally:
         ar.clean_up()
-
