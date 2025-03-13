@@ -51,7 +51,7 @@ class AutoReservation:
         self.driver.set_window_size(1920, 1080)
         self.wait: WebDriverWait = WebDriverWait(
             self.driver,
-            timeout=5,
+            timeout=3.5,
         )
 
         self.action_chains = ActionChains(self.driver)
@@ -335,7 +335,7 @@ class AutoReservation:
                     message="验证码刷新按钮加载超时",
                 )
                 src = img_block.get_dom_attribute('src')
-                prc_src = src
+                prv_src = src
                 verifyPic_base64 = src.replace('data:image/jpg;base64,', '')
             except Exception as e:
                 print_with_time(e)
@@ -353,7 +353,7 @@ class AutoReservation:
             except Exception as e:
                 print_with_time(e)
                 print_with_time("字符串获取失败")
-            move = ActionChains(self.driver, 50)
+            move = ActionChains(self.driver, 20)
             
 
             img_block_size = img_block.size
